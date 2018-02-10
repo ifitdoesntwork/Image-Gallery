@@ -8,20 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15C2202EB7F500F72D62 /* AppDelegate.swift */; };
-		928F15C5202EB7F500F72D62 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15C4202EB7F500F72D62 /* ViewController.swift */; };
 		928F15C8202EB7F500F72D62 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C6202EB7F500F72D62 /* Main.storyboard */; };
 		928F15CA202EB7F500F72D62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C9202EB7F500F72D62 /* Assets.xcassets */; };
 		928F15CD202EB7F500F72D62 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928F15CB202EB7F500F72D62 /* LaunchScreen.storyboard */; };
+		928F15D6202EB87E00F72D62 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15D5202EB87E00F72D62 /* Utilities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		928F15BF202EB7F500F72D62 /* Image Gallery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Image Gallery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		928F15C2202EB7F500F72D62 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		928F15C4202EB7F500F72D62 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		928F15C7202EB7F500F72D62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		928F15C9202EB7F500F72D62 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		928F15CC202EB7F500F72D62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		928F15CE202EB7F500F72D62 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		928F15D5202EB87E00F72D62 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,14 +54,22 @@
 		928F15C1202EB7F500F72D62 /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
-				928F15C2202EB7F500F72D62 /* AppDelegate.swift */,
-				928F15C4202EB7F500F72D62 /* ViewController.swift */,
+				928F15D5202EB87E00F72D62 /* Utilities.swift */,
 				928F15C6202EB7F500F72D62 /* Main.storyboard */,
-				928F15C9202EB7F500F72D62 /* Assets.xcassets */,
-				928F15CB202EB7F500F72D62 /* LaunchScreen.storyboard */,
+				928F15D4202EB82B00F72D62 /* Supporting Files */,
 				928F15CE202EB7F500F72D62 /* Info.plist */,
 			);
 			path = "Image Gallery";
+			sourceTree = "<group>";
+		};
+		928F15D4202EB82B00F72D62 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				928F15C9202EB7F500F72D62 /* Assets.xcassets */,
+				928F15C2202EB7F500F72D62 /* AppDelegate.swift */,
+				928F15CB202EB7F500F72D62 /* LaunchScreen.storyboard */,
+			);
+			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -136,7 +144,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				928F15C5202EB7F500F72D62 /* ViewController.swift in Sources */,
+				928F15D6202EB87E00F72D62 /* Utilities.swift in Sources */,
 				928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -276,11 +284,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "Image Gallery/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.denisavdeev.Image-Gallery";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -290,11 +299,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "Image Gallery/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.denisavdeev.Image-Gallery";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};
