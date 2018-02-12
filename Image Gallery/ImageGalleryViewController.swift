@@ -30,7 +30,13 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
             makeSureCellsFitViewHeight()
         }
     }
-
+    
+    @IBOutlet weak var trashCan: UIButton! {
+        didSet {
+            trashCan.addInteraction(UIDropInteraction(delegate: self))
+        }
+    }
+    
     // MARK: - UICollectionViewDataSource
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -94,7 +100,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     private func dragItems(at indexPath: IndexPath) -> [UIDragItem] {
         let image = images[indexPath.item]
         let dragItem = UIDragItem(itemProvider: NSItemProvider(object: image.url as NSItemProviderWriting))
-        dragItem.localObject = image
+        dragItem.localObject = (indexPath, image)
         return [dragItem]
     }
     
@@ -113,7 +119,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         var destinationIndexPath = coordinator.destinationIndexPath ?? IndexPath(item: collectionView.numberOfItems(inSection: 0), section: 0)
         coordinator.items.forEach { item in
             if let sourceIndexPath = item.sourceIndexPath {
-                if let sourceImage = item.dragItem.localObject as? (url: URL, heightToWidthRatio: CGFloat) {
+                if let sourceImage = (item.dragItem.localObject as? (IndexPath, (url: URL, heightToWidthRatio: CGFloat)))?.1 {
                     if destinationIndexPath.item == images.count {
                         destinationIndexPath.item -= 1
                     }
@@ -170,6 +176,28 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         }
     }
     
+    // MARK: - UIDropInteractionDelegate
+    
+    func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
+        return session.canLoadObjects(ofClass: NSURL.self)
+    }
+    
+    func dropInteraction(_ interaction: UIDropInteraction, sessionDidUpdate session: UIDropSession) -> UIDropProposal {
+        let isSelf = session.localDragSession?.localContext as? UICollectionView == collectionView
+        return UICollectionViewDropProposal(operation: isSelf ? .copy : .cancel)
+    }
+    
+    func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
+        session.localDragSession?.items.forEach { item in
+            if let sourceIndexPath = (item.localObject as? (IndexPath, (url: URL, heightToWidthRatio: CGFloat)))?.0 {
+                collectionView?.performBatchUpdates({
+                    images.remove(at: sourceIndexPath.item)
+                    collectionView?.deleteItems(at: [sourceIndexPath])
+                })
+            }
+        }
+    }
+
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

@@ -86,7 +86,21 @@
                             <outlet property="delegate" destination="ENH-QG-xlx" id="e5W-MI-Tlh"/>
                         </connections>
                     </collectionView>
-                    <navigationItem key="navigationItem" title="Image Gallery" id="pDF-qW-4Fg"/>
+                    <navigationItem key="navigationItem" title="Image Gallery" id="pDF-qW-4Fg">
+                        <barButtonItem key="rightBarButtonItem" id="ijx-uH-Vpi">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="qRe-Cd-4oy">
+                                <rect key="frame" x="638.5" y="5" width="45" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" title="Trash">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                            </button>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="trashCan" destination="qRe-Cd-4oy" id="M8M-xf-RZJ"/>
+                    </connections>
                 </collectionViewController>
             </objects>
             <point key="canvasLocation" x="160.546875" y="47.65625"/>
