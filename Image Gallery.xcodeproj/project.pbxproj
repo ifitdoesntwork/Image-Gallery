@@ -12,6 +12,11 @@
 		928F15CA202EB7F500F72D62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C9202EB7F500F72D62 /* Assets.xcassets */; };
 		928F15CD202EB7F500F72D62 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928F15CB202EB7F500F72D62 /* LaunchScreen.storyboard */; };
 		928F15D6202EB87E00F72D62 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15D5202EB87E00F72D62 /* Utilities.swift */; };
+		928F15D8202EBE4900F72D62 /* ImageGalleryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15D7202EBE4900F72D62 /* ImageGalleryViewController.swift */; };
+		928F15DA202EC88100F72D62 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15D9202EC88100F72D62 /* ImageCollectionViewCell.swift */; };
+		92E1C165203015110081B393 /* GalleryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E1C164203015110081B393 /* GalleryTableViewController.swift */; };
+		92E1C167203045150081B393 /* GalleryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E1C166203045150081B393 /* GalleryTableViewCell.swift */; };
+		92E1C16920305B470081B393 /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E1C16820305B470081B393 /* ImageViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +27,11 @@
 		928F15CC202EB7F500F72D62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		928F15CE202EB7F500F72D62 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		928F15D5202EB87E00F72D62 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		928F15D7202EBE4900F72D62 /* ImageGalleryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGalleryViewController.swift; sourceTree = "<group>"; };
+		928F15D9202EC88100F72D62 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
+		92E1C164203015110081B393 /* GalleryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTableViewController.swift; sourceTree = "<group>"; };
+		92E1C166203045150081B393 /* GalleryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTableViewCell.swift; sourceTree = "<group>"; };
+		92E1C16820305B470081B393 /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,8 +64,13 @@
 		928F15C1202EB7F500F72D62 /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
-				928F15D5202EB87E00F72D62 /* Utilities.swift */,
+				92E1C164203015110081B393 /* GalleryTableViewController.swift */,
+				92E1C166203045150081B393 /* GalleryTableViewCell.swift */,
+				928F15D7202EBE4900F72D62 /* ImageGalleryViewController.swift */,
+				928F15D9202EC88100F72D62 /* ImageCollectionViewCell.swift */,
+				92E1C16820305B470081B393 /* ImageViewController.swift */,
 				928F15C6202EB7F500F72D62 /* Main.storyboard */,
+				928F15D5202EB87E00F72D62 /* Utilities.swift */,
 				928F15D4202EB82B00F72D62 /* Supporting Files */,
 				928F15CE202EB7F500F72D62 /* Info.plist */,
 			);
@@ -144,7 +159,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				928F15D8202EBE4900F72D62 /* ImageGalleryViewController.swift in Sources */,
 				928F15D6202EB87E00F72D62 /* Utilities.swift in Sources */,
+				92E1C167203045150081B393 /* GalleryTableViewCell.swift in Sources */,
+				92E1C16920305B470081B393 /* ImageViewController.swift in Sources */,
+				92E1C165203015110081B393 /* GalleryTableViewController.swift in Sources */,
+				928F15DA202EC88100F72D62 /* ImageCollectionViewCell.swift in Sources */,
 				928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
