@@ -8,6 +8,13 @@
 
 import UIKit
 
+struct Gallery: Codable {
+    /// The gallery title.
+    var title: String
+    /// The gallery images data.
+    var images: [ImageData]
+}
+
 class GalleryTableViewController: UITableViewController, ImageGalleryViewControllerDelegate, GalleryTableViewCellDelegate {
 
     private struct Constants {
@@ -16,13 +23,27 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         static let gallerySegueIdentifier = "Select Gallery"
         static let deletedGalleriesSectionTitle = "Recently Deleted"
         static let undeleteActionTitle = "Undelete"
+        static let galleriesPersistanceKey = "Galleries"
+        static let deletedGalleriesPersistanceKey = "Deleted Galleries"
     }
 
     /// An array of pairs of `title` and image data (as `images`) of galleries.
-    var galleries = [(title: Constants.genericGalleryTitle, images: [ImageData]())]
+    var galleries = [Gallery(title: Constants.genericGalleryTitle, images: [ImageData]())] {
+        didSet {
+            if let galleriesData = try? PropertyListEncoder().encode(galleries) {
+                UserDefaults.standard.set(galleriesData, forKey: Constants.galleriesPersistanceKey)
+            }
+        }
+    }
     
     /// An array of pairs of `title` and image data (as `images`) of recently deleted galleries.
-    var deletedGalleries = [(title: String, images: [ImageData])]()
+    var deletedGalleries = [Gallery]() {
+        didSet {
+            if let galleriesData = try? PropertyListEncoder().encode(deletedGalleries) {
+                UserDefaults.standard.set(galleriesData, forKey: Constants.deletedGalleriesPersistanceKey)
+            }
+        }
+    }
 
     // MARK: - ImageGalleryViewControllerDelegate
     
@@ -131,9 +152,9 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
     // MARK: - Actions
     
     @IBAction private func addGallery(_ sender: UIBarButtonItem) {
-        galleries += [(
-            Constants.genericGalleryTitle.madeUnique(withRespectTo: (galleries + deletedGalleries).map { $0.title }),
-            [ImageData]()
+        galleries += [Gallery(
+            title: Constants.genericGalleryTitle.madeUnique(withRespectTo: (galleries + deletedGalleries).map { $0.title }),
+            images: [ImageData]()
             )]
         tableView.insertRows(at: [IndexPath(row: galleries.count - 1, section: 0)], with: .automatic)
     }
@@ -167,9 +188,15 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
     
     // MARK: - Lifecycle
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        if let galleriesData = UserDefaults.standard.value(forKey: Constants.galleriesPersistanceKey) as? Data {
+            galleries = (try? PropertyListDecoder().decode([Gallery].self, from: galleriesData)) ?? galleries
+        }
+        if let galleriesData = UserDefaults.standard.value(forKey: Constants.deletedGalleriesPersistanceKey) as? Data {
+            deletedGalleries = (try? PropertyListDecoder().decode([Gallery].self, from: galleriesData)) ?? deletedGalleries
+        }
+    }
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()

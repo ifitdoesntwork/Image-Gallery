@@ -8,7 +8,12 @@
 
 import UIKit
 
-typealias ImageData = (url: URL, heightToWidthRatio: CGFloat)
+struct ImageData: Codable {
+    /// The image URL.
+    var url: URL
+    /// The image height to width ratio.
+    var heightToWidthRatio: CGFloat
+}
 
 class ImageGalleryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UIDropInteractionDelegate, UICollectionViewDropDelegate, UICollectionViewDragDelegate {
 
@@ -119,7 +124,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         var destinationIndexPath = coordinator.destinationIndexPath ?? IndexPath(item: collectionView.numberOfItems(inSection: 0), section: 0)
         coordinator.items.forEach { item in
             if let sourceIndexPath = item.sourceIndexPath {
-                if let sourceImage = (item.dragItem.localObject as? (IndexPath, (url: URL, heightToWidthRatio: CGFloat)))?.1 {
+                if let sourceImage = (item.dragItem.localObject as? (IndexPath, ImageData))?.1 {
                     if destinationIndexPath.item == images.count {
                         destinationIndexPath.item -= 1
                     }
@@ -171,7 +176,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         let loadedImage = loadingImages[index]
         if let url = loadedImage.url, let ratio = loadedImage.heightToWidthRatio {
             placeholderContext.commitInsertion { insertionIndexPath in
-                images.insert((url, ratio), at: insertionIndexPath.item)
+                images.insert(ImageData(url: url, heightToWidthRatio: ratio), at: insertionIndexPath.item)
             }
         }
     }
@@ -189,7 +194,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     
     func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
         session.localDragSession?.items.forEach { item in
-            if let sourceIndexPath = (item.localObject as? (IndexPath, (url: URL, heightToWidthRatio: CGFloat)))?.0 {
+            if let sourceIndexPath = (item.localObject as? (IndexPath, ImageData))?.0 {
                 collectionView?.performBatchUpdates({
                     images.remove(at: sourceIndexPath.item)
                     collectionView?.deleteItems(at: [sourceIndexPath])

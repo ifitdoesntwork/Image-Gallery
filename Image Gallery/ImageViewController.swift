@@ -45,7 +45,7 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet private weak var spinner: UIActivityIndicatorView!
     
-    @IBOutlet weak var errorLabel: UILabel!
+    @IBOutlet private weak var errorLabel: UILabel!
     
     @IBOutlet private weak var scrollView: UIScrollView! {
         didSet {
