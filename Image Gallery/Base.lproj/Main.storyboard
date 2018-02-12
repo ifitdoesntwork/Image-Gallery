@@ -215,7 +215,7 @@
                     <navigationItem key="navigationItem" title="Galleries" id="dUq-mn-SSW">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="eqo-Wq-UTO">
                             <connections>
-                                <action selector="addGallery:" destination="7k4-Gq-08z" id="VZm-SH-SH1"/>
+                                <action selector="addGallery" destination="7k4-Gq-08z" id="IHR-fw-8K3"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

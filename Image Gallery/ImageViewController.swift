@@ -10,6 +10,11 @@ import UIKit
 
 class ImageViewController: UIViewController, UIScrollViewDelegate {
 
+    private struct ZoomScale {
+        static let minimum: CGFloat = 1 / 25
+        static let maximum: CGFloat = 1.0
+    }
+    
     /// The image URL.
     var imageURL: URL? {
         didSet {
@@ -49,8 +54,8 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet private weak var scrollView: UIScrollView! {
         didSet {
-            scrollView.minimumZoomScale = 1/25
-            scrollView.maximumZoomScale = 1.0
+            scrollView.minimumZoomScale = ZoomScale.minimum
+            scrollView.maximumZoomScale = ZoomScale.maximum
             scrollView.delegate = self
             scrollView.addSubview(imageView)
         }

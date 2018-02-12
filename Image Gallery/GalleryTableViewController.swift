@@ -15,7 +15,7 @@ struct Gallery: Codable {
     var images: [ImageData]
 }
 
-class GalleryTableViewController: UITableViewController, ImageGalleryViewControllerDelegate, GalleryTableViewCellDelegate {
+class GalleryTableViewController: UITableViewController, ImageGalleryViewControllerDelegate, GalleryTableViewCellDelegate, UISplitViewControllerDelegate {
 
     private struct Constants {
         static let cellReuseIdentifier = "Gallery Cell"
@@ -25,10 +25,11 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         static let undeleteActionTitle = "Undelete"
         static let galleriesPersistanceKey = "Galleries"
         static let deletedGalleriesPersistanceKey = "Deleted Galleries"
+        static let selectionTimer = 0.1
     }
 
     /// An array of pairs of `title` and image data (as `images`) of galleries.
-    var galleries = [Gallery(title: Constants.genericGalleryTitle, images: [ImageData]())] {
+    var galleries = [Gallery]() {
         didSet {
             if let galleriesData = try? PropertyListEncoder().encode(galleries) {
                 UserDefaults.standard.set(galleriesData, forKey: Constants.galleriesPersistanceKey)
@@ -48,8 +49,8 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
     // MARK: - ImageGalleryViewControllerDelegate
     
     func gallerydidChangeModel(_ gallery: ImageGalleryViewController) {
-        if let selectedCellIndex = tableView.indexPathForSelectedRow?.row, gallery == seguedToGallery {
-            galleries[selectedCellIndex].images = gallery.images
+        if gallery == seguedToGallery?.controller {
+            galleries[seguedToGallery!.indexPath.row].images = gallery.images
         }
     }
 
@@ -59,7 +60,7 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         if let indexPath = tableView.indexPath(for: cell) {
             if indexPath.section == 0 {
                 galleries[indexPath.row].title = title
-                seguedToGallery?.title = galleries[indexPath.row].title
+                seguedToGallery?.controller.title = galleries[indexPath.row].title
             } else {
                 deletedGalleries[indexPath.row].title = title
             }
@@ -94,11 +95,20 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         if editingStyle == .delete {
             tableView.performBatchUpdates({
                 if indexPath.section == 0 {
-                    deletedGalleries.append(galleries.remove(at: indexPath.row))
+                    deletedGalleries.append(galleries[indexPath.row])
+                    galleries.remove(at: indexPath.row)
                     if tableView.numberOfSections == 1 {
                         tableView.insertSections(IndexSet(integer: 1), with: .automatic)
                     }
                     tableView.insertRows(at: [IndexPath(row: deletedGalleries.count - 1, section: 1)], with: .automatic)
+                    if let selectedIndexPath = seguedToGallery?.indexPath, selectedIndexPath.row >= indexPath.row {
+                        let newSelectedRow = selectedIndexPath.row > 0 ? selectedIndexPath.row - 1 : selectedIndexPath.row
+                        seguedToGallery?.indexPath = IndexPath(row: newSelectedRow, section: 0)
+                        if selectedIndexPath.row == indexPath.row && galleries.count > 0 {
+                            performSegue(withIdentifier: Constants.gallerySegueIdentifier, sender: tableView.cellForRow(at: seguedToGallery!.indexPath))
+                        }
+                    }
+                    haveAtLeastOneGallery()
                 } else {
                     deletedGalleries.remove(at: indexPath.row)
                     if deletedGalleries.isEmpty {
@@ -109,21 +119,14 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
             })
         }
     }
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+    
+    override func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
+        Timer.scheduledTimer(withTimeInterval: Constants.selectionTimer, repeats: false) { [weak self] _ in
+            if let selectedIndexPath = self?.seguedToGallery?.indexPath {
+                self?.tableView.selectRow(at: selectedIndexPath, animated: true, scrollPosition: .none)
+            }
+        }
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     // MARK: - UITableViewDelegate
 
@@ -148,26 +151,49 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         }
         return UISwipeActionsConfiguration(actions: [action])
     }
+    
+    override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        return indexPath.section == 0
+    }
+
+    // MARK: - UISplitViewControllerDelegate
+    
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        return seguedToGallery == nil
+    }
 
     // MARK: - Actions
     
-    @IBAction private func addGallery(_ sender: UIBarButtonItem) {
+    @IBAction private func addGallery() {
         galleries += [Gallery(
             title: Constants.genericGalleryTitle.madeUnique(withRespectTo: (galleries + deletedGalleries).map { $0.title }),
             images: [ImageData]()
-            )]
+        )]
         tableView.insertRows(at: [IndexPath(row: galleries.count - 1, section: 0)], with: .automatic)
+    }
+    
+    private func haveAtLeastOneGallery() {
+        if galleries.isEmpty {
+            addGallery()
+            selectFirstRow()
+        }
+    }
+    
+    func selectFirstRow() {
+        let indexPath = IndexPath(row: 0, section: 0)
+        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        performSegue(withIdentifier: Constants.gallerySegueIdentifier, sender: tableView.cellForRow(at: indexPath))
     }
     
     // MARK: - Navigation
 
-    private var seguedToGallery: ImageGalleryViewController?
+    private var seguedToGallery: (indexPath: IndexPath, controller: ImageGalleryViewController)?
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Constants.gallerySegueIdentifier {
             if let destination = segue.destination.contents as? ImageGalleryViewController {
-                seguedToGallery = destination
                 if let cell = sender as? UITableViewCell, let indexPath = tableView.indexPath(for: cell) {
+                    seguedToGallery = (indexPath, destination)
                     destination.delegate = self
                     destination.title = galleries[indexPath.row].title
                     destination.images = galleries[indexPath.row].images
@@ -176,17 +202,12 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         }
     }
     
-    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        if let cell = sender as? UITableViewCell, let indexPath = tableView.indexPath(for: cell) {
-            if indexPath.section == 1 {
-                tableView.deselectRow(at: indexPath, animated: true)
-                return false
-            }
-        }
-        return true
-    }
-    
     // MARK: - Lifecycle
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        splitViewController?.delegate = self
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -195,6 +216,14 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
         }
         if let galleriesData = UserDefaults.standard.value(forKey: Constants.deletedGalleriesPersistanceKey) as? Data {
             deletedGalleries = (try? PropertyListDecoder().decode([Gallery].self, from: galleriesData)) ?? deletedGalleries
+        }
+        haveAtLeastOneGallery()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if tableView.indexPathForSelectedRow == nil {
+            selectFirstRow()
         }
     }
     
