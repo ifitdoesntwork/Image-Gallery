@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9260A64A2033F6840040785D /* Gallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9260A6492033F6840040785D /* Gallery.swift */; };
 		928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15C2202EB7F500F72D62 /* AppDelegate.swift */; };
 		928F15C8202EB7F500F72D62 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C6202EB7F500F72D62 /* Main.storyboard */; };
 		928F15CA202EB7F500F72D62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C9202EB7F500F72D62 /* Assets.xcassets */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9260A6492033F6840040785D /* Gallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gallery.swift; sourceTree = "<group>"; };
 		928F15BF202EB7F500F72D62 /* Image Gallery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Image Gallery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		928F15C2202EB7F500F72D62 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		928F15C7202EB7F500F72D62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 		928F15C1202EB7F500F72D62 /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
+				9260A6492033F6840040785D /* Gallery.swift */,
 				92E1C164203015110081B393 /* GalleryTableViewController.swift */,
 				92E1C166203045150081B393 /* GalleryTableViewCell.swift */,
 				928F15D7202EBE4900F72D62 /* ImageGalleryViewController.swift */,
@@ -166,6 +169,7 @@
 				92E1C165203015110081B393 /* GalleryTableViewController.swift in Sources */,
 				928F15DA202EC88100F72D62 /* ImageCollectionViewCell.swift in Sources */,
 				928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */,
+				9260A64A2033F6840040785D /* Gallery.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

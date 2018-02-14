@@ -8,13 +8,6 @@
 
 import UIKit
 
-struct ImageData: Codable {
-    /// The image URL.
-    var url: URL
-    /// The image height to width ratio.
-    var heightToWidthRatio: CGFloat
-}
-
 class ImageGalleryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UIDropInteractionDelegate, UICollectionViewDropDelegate, UICollectionViewDragDelegate {
 
     private struct Cell {
@@ -28,15 +21,33 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     /// The image gallery delegate.
     var delegate: ImageGalleryViewControllerDelegate?
     
-    /// An array of image data containing pairs of an image's `url` and its `heightToWidthRatio`.
-    var images = [ImageData]() {
+    /// The gallery data model.
+    var gallery: Gallery? {
+        get {
+            let images = imagesData.map { imageData in
+                Gallery.Image(
+                    url: imageData.url,
+                    heightToWidthRatio: Double(imageData.heightToWidthRatio)
+                )
+            }
+            return Gallery(title: title, images: images)
+        }
+        set {
+            title = newValue?.title
+            imagesData = newValue?.images.map { ($0.url, CGFloat($0.heightToWidthRatio)) } ?? []
+        }
+    }
+    
+    private typealias ImageData = (url: URL, heightToWidthRatio: CGFloat)
+    
+    private var imagesData = [ImageData]() {
         didSet {
             delegate?.gallerydidChangeModel(self)
             makeSureCellsFitViewHeight()
         }
     }
     
-    @IBOutlet weak var trashCan: UIButton! {
+    @IBOutlet private weak var trashCan: UIButton! {
         didSet {
             trashCan.addInteraction(UIDropInteraction(delegate: self))
         }
@@ -45,13 +56,13 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     // MARK: - UICollectionViewDataSource
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count
+        return imagesData.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Cell.reuseIdentifier, for: indexPath)
         if let imageCell = cell as? ImageCollectionViewCell {
-            imageCell.imageURL = images[indexPath.item].url
+            imageCell.imageURL = imagesData[indexPath.item].url
         }
         return cell
     }
@@ -65,8 +76,8 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     private var cellWidthToFitViewHeight: CGFloat {
         if let superview = collectionView {
             let maxCellHeight = superview.bounds.height - superview.layoutMargins.top - superview.layoutMargins.bottom
-            return images.indices.reduce(CGFloat.infinity) { maxCellWidth, imageIndex in
-                let widthForMaximumHeight = maxCellHeight / images[imageIndex].heightToWidthRatio
+            return imagesData.indices.reduce(CGFloat.infinity) { maxCellWidth, imageIndex in
+                let widthForMaximumHeight = maxCellHeight / imagesData[imageIndex].heightToWidthRatio
                 return widthForMaximumHeight < maxCellWidth ? widthForMaximumHeight : maxCellWidth
             }
         } else {
@@ -88,7 +99,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: cellWidth, height: cellWidth * images[indexPath.item].heightToWidthRatio)
+        return CGSize(width: cellWidth, height: cellWidth * imagesData[indexPath.item].heightToWidthRatio)
     }
     
     // MARK: - UICollectionViewDragDelegate
@@ -103,7 +114,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     }
     
     private func dragItems(at indexPath: IndexPath) -> [UIDragItem] {
-        let image = images[indexPath.item]
+        let image = imagesData[indexPath.item]
         let dragItem = UIDragItem(itemProvider: NSItemProvider(object: image.url as NSItemProviderWriting))
         dragItem.localObject = (indexPath, image)
         return [dragItem]
@@ -125,12 +136,12 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         coordinator.items.forEach { item in
             if let sourceIndexPath = item.sourceIndexPath {
                 if let sourceImage = (item.dragItem.localObject as? (IndexPath, ImageData))?.1 {
-                    if destinationIndexPath.item == images.count {
+                    if destinationIndexPath.item == imagesData.count {
                         destinationIndexPath.item -= 1
                     }
                     collectionView.performBatchUpdates({
-                        images.remove(at: sourceIndexPath.item)
-                        images.insert(sourceImage, at: destinationIndexPath.item)
+                        imagesData.remove(at: sourceIndexPath.item)
+                        imagesData.insert(sourceImage, at: destinationIndexPath.item)
                         collectionView.deleteItems(at: [sourceIndexPath])
                         collectionView.insertItems(at: [destinationIndexPath])
                     })
@@ -141,21 +152,21 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
                 let placeholderContext = coordinator.drop(item.dragItem, to: placeholder)
                 let imageIndex = loadingImages.endIndex
                 loadingImages.append((0, placeholderContext, nil, nil))
-                item.dragItem.itemProvider.loadObject(ofClass: NSURL.self) { (provider, error) in
+                item.dragItem.itemProvider.loadObject(ofClass: NSURL.self) { [weak placeholderContext] (provider, error) in
                     DispatchQueue.main.async { [weak self] in
-                        if let url = provider as? URL {
-                            self?.completeLoadingOfImage(at: imageIndex, in: placeholderContext, loadedUrl: url.imageURL, loadedRatio: nil)
+                        if let url = provider as? URL, let context = placeholderContext {
+                            self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: url.imageURL, loadedRatio: nil)
                         } else {
-                            placeholderContext.deletePlaceholder()
+                            placeholderContext?.deletePlaceholder()
                         }
                     }
                 }
-                item.dragItem.itemProvider.loadObject(ofClass: UIImage.self) { (provider, error) in
+                item.dragItem.itemProvider.loadObject(ofClass: UIImage.self) { [weak placeholderContext] (provider, error) in
                     DispatchQueue.main.async { [weak self] in
-                        if let image = provider as? UIImage {
-                            self?.completeLoadingOfImage(at: imageIndex, in: placeholderContext, loadedUrl: nil, loadedRatio: image.size.height / image.size.width)
+                        if let image = provider as? UIImage, let context = placeholderContext {
+                            self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: nil, loadedRatio: image.size.height / image.size.width)
                         } else {
-                            placeholderContext.deletePlaceholder()
+                            placeholderContext?.deletePlaceholder()
                         }
                     }
                 }
@@ -176,7 +187,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         let loadedImage = loadingImages[index]
         if let url = loadedImage.url, let ratio = loadedImage.heightToWidthRatio {
             placeholderContext.commitInsertion { insertionIndexPath in
-                images.insert(ImageData(url: url, heightToWidthRatio: ratio), at: insertionIndexPath.item)
+                imagesData.insert((url, ratio), at: insertionIndexPath.item)
             }
         }
     }
@@ -196,7 +207,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         session.localDragSession?.items.forEach { item in
             if let sourceIndexPath = (item.localObject as? (IndexPath, ImageData))?.0 {
                 collectionView?.performBatchUpdates({
-                    images.remove(at: sourceIndexPath.item)
+                    imagesData.remove(at: sourceIndexPath.item)
                     collectionView?.deleteItems(at: [sourceIndexPath])
                 })
             }
@@ -208,7 +219,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Cell.segueIdentifier, let cell = sender as? ImageCollectionViewCell, let indexPath = collectionView?.indexPath(for: cell) {
             if let destination = segue.destination as? ImageViewController {
-                destination.imageURL = images[indexPath.item].url
+                destination.imageURL = imagesData[indexPath.item].url
                 destination.title = Cell.imageTitle
             }
         }

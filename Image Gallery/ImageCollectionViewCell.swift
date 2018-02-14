@@ -30,6 +30,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
         set {
             imageView.image = newValue
             spinner.stopAnimating()
+            errorLabel.isHidden = true
         }
     }
 
