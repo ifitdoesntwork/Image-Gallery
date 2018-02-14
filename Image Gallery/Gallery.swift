@@ -9,7 +9,8 @@
 import Foundation
 
 struct Gallery: Codable {
-    /// The gallery title.
+    /// The gallery unique ID.
+    var id: Int
     var title: String?
     /// The gallery images data.
     var images: [Image]
@@ -33,8 +34,8 @@ struct Gallery: Codable {
         }
     }
     
-    init(title: String?, images: [Image]) {
-        self.title = title
+    init(images: [Image]) {
+        self.id = 0
         self.images = images
     }
 }

@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		923418B420341559006BC558 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923418B320341559006BC558 /* AppDelegate.swift */; };
+		923418B6203415A1006BC558 /* ImageGalleryDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923418B5203415A1006BC558 /* ImageGalleryDocument.swift */; };
+		923418B820341609006BC558 /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923418B720341609006BC558 /* DocumentBrowserViewController.swift */; };
 		9260A64A2033F6840040785D /* Gallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9260A6492033F6840040785D /* Gallery.swift */; };
-		928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928F15C2202EB7F500F72D62 /* AppDelegate.swift */; };
 		928F15C8202EB7F500F72D62 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C6202EB7F500F72D62 /* Main.storyboard */; };
 		928F15CA202EB7F500F72D62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 928F15C9202EB7F500F72D62 /* Assets.xcassets */; };
 		928F15CD202EB7F500F72D62 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 928F15CB202EB7F500F72D62 /* LaunchScreen.storyboard */; };
@@ -21,9 +23,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		923418B320341559006BC558 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		923418B5203415A1006BC558 /* ImageGalleryDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageGalleryDocument.swift; sourceTree = "<group>"; };
+		923418B720341609006BC558 /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
 		9260A6492033F6840040785D /* Gallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gallery.swift; sourceTree = "<group>"; };
 		928F15BF202EB7F500F72D62 /* Image Gallery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Image Gallery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		928F15C2202EB7F500F72D62 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		928F15C7202EB7F500F72D62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		928F15C9202EB7F500F72D62 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		928F15CC202EB7F500F72D62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -66,13 +70,13 @@
 		928F15C1202EB7F500F72D62 /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
-				9260A6492033F6840040785D /* Gallery.swift */,
-				92E1C164203015110081B393 /* GalleryTableViewController.swift */,
-				92E1C166203045150081B393 /* GalleryTableViewCell.swift */,
+				923418B720341609006BC558 /* DocumentBrowserViewController.swift */,
 				928F15D7202EBE4900F72D62 /* ImageGalleryViewController.swift */,
 				928F15D9202EC88100F72D62 /* ImageCollectionViewCell.swift */,
 				92E1C16820305B470081B393 /* ImageViewController.swift */,
 				928F15C6202EB7F500F72D62 /* Main.storyboard */,
+				923418B5203415A1006BC558 /* ImageGalleryDocument.swift */,
+				9260A6492033F6840040785D /* Gallery.swift */,
 				928F15D5202EB87E00F72D62 /* Utilities.swift */,
 				928F15D4202EB82B00F72D62 /* Supporting Files */,
 				928F15CE202EB7F500F72D62 /* Info.plist */,
@@ -83,8 +87,10 @@
 		928F15D4202EB82B00F72D62 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				92E1C164203015110081B393 /* GalleryTableViewController.swift */,
+				92E1C166203045150081B393 /* GalleryTableViewCell.swift */,
 				928F15C9202EB7F500F72D62 /* Assets.xcassets */,
-				928F15C2202EB7F500F72D62 /* AppDelegate.swift */,
+				923418B320341559006BC558 /* AppDelegate.swift */,
 				928F15CB202EB7F500F72D62 /* LaunchScreen.storyboard */,
 			);
 			path = "Supporting Files";
@@ -162,13 +168,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				923418B420341559006BC558 /* AppDelegate.swift in Sources */,
 				928F15D8202EBE4900F72D62 /* ImageGalleryViewController.swift in Sources */,
+				923418B820341609006BC558 /* DocumentBrowserViewController.swift in Sources */,
 				928F15D6202EB87E00F72D62 /* Utilities.swift in Sources */,
 				92E1C167203045150081B393 /* GalleryTableViewCell.swift in Sources */,
+				923418B6203415A1006BC558 /* ImageGalleryDocument.swift in Sources */,
 				92E1C16920305B470081B393 /* ImageViewController.swift in Sources */,
 				92E1C165203015110081B393 /* GalleryTableViewController.swift in Sources */,
 				928F15DA202EC88100F72D62 /* ImageCollectionViewCell.swift in Sources */,
-				928F15C3202EB7F500F72D62 /* AppDelegate.swift in Sources */,
 				9260A64A2033F6840040785D /* Gallery.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -243,7 +251,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -294,7 +302,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -307,13 +315,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FJ92CF92XR;
 				INFOPLIST_FILE = "Image Gallery/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.denisavdeev.Image-Gallery";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -322,13 +331,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FJ92CF92XR;
 				INFOPLIST_FILE = "Image Gallery/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.denisavdeev.Image-Gallery";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

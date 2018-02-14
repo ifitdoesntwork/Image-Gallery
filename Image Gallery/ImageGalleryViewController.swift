@@ -21,6 +21,9 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     /// The image gallery delegate.
     var delegate: ImageGalleryViewControllerDelegate?
     
+    /// The image gallery document.
+    var document: ImageGalleryDocument?
+    
     /// The gallery data model.
     var gallery: Gallery? {
         get {
@@ -30,11 +33,11 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
                     heightToWidthRatio: Double(imageData.heightToWidthRatio)
                 )
             }
-            return Gallery(title: title, images: images)
+            return Gallery(images: images)
         }
         set {
-            title = newValue?.title
             imagesData = newValue?.images.map { ($0.url, CGFloat($0.heightToWidthRatio)) } ?? []
+            collectionView?.reloadData()
         }
     }
     
@@ -44,8 +47,12 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         didSet {
             delegate?.gallerydidChangeModel(self)
             makeSureCellsFitViewHeight()
+            document?.gallery = gallery
+            document?.updateChangeCount(.done)
         }
     }
+    
+    @IBOutlet weak var spinner: UIActivityIndicatorView!
     
     @IBOutlet private weak var trashCan: UIButton! {
         didSet {
@@ -127,6 +134,9 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        guard document?.documentState == .normal else {
+            return UICollectionViewDropProposal(operation: .cancel)
+        }
         let isSelf = session.localDragSession?.localContext as? UICollectionView == collectionView
         return UICollectionViewDropProposal(operation: isSelf ? .move : .copy, intent: .insertAtDestinationIndexPath)
     }
@@ -214,6 +224,15 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         }
     }
 
+    // MARK: - Actions
+    
+    @IBAction func close(_ sender: UIBarButtonItem) {
+        document?.thumbnail = collectionView?.snapshot
+        dismiss(animated: true) {
+            self.document?.close()
+        }
+    }
+    
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -231,9 +250,45 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         super.viewDidLoad()
         collectionView?.dragDelegate = self
         collectionView?.dropDelegate = self
+        collectionView?.dragInteractionEnabled = true
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(ImageGalleryViewController.pinch(_:)))
         collectionView?.addGestureRecognizer(pinch)
-        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+        if document == nil {
+            if let url = try? FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+                ).appendingPathComponent("Untitled.gallery") {
+                if !FileManager.default.isReadableFile(atPath: url.path) {
+                    do {
+                        try Data().write(to: url)
+                    } catch let error {
+                        print("Error creating empty file: \(error)")
+                    }
+                }
+                document = ImageGalleryDocument(fileURL: url)
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if document?.documentState == .closed {
+            document?.open { [weak self] success in
+                if success {
+                    self?.title = self?.document?.localizedName
+                    self?.trashCan.isEnabled = true
+                    self?.gallery = self?.document?.gallery
+                }
+                self?.spinner.stopAnimating()
+            }
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        makeSureCellsFitViewHeight()
     }
     
     @objc private func pinch(_ gesture: UIPinchGestureRecognizer) {

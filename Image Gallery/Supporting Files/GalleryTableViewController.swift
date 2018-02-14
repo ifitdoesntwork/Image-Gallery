@@ -159,7 +159,7 @@ class GalleryTableViewController: UITableViewController, ImageGalleryViewControl
     
     @IBAction private func addGallery() {
         galleries += [Gallery(
-            title: Constants.newGalleryTitle.madeUnique(withRespectTo: (galleries + deletedGalleries).flatMap { $0.title }),
+//            title: Constants.newGalleryTitle.madeUnique(withRespectTo: (galleries + deletedGalleries).flatMap { $0.title }),
             images: [Gallery.Image]()
         )]
         tableView.insertRows(at: [IndexPath(row: galleries.count - 1, section: 0)], with: .automatic)
