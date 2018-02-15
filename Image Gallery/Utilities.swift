@@ -86,6 +86,26 @@ extension URL {
             return self.baseURL ?? self
         }
     }
+    
+    func cachedContents() -> Data? {
+        let request = URLRequest(url: self)
+        if let cachedContents = URLCache.shared.cachedResponse(for: request)?.data {
+            return cachedContents
+        } else if let contents = try? Data(contentsOf: self) {
+            let response = URLResponse(
+                url: self,
+                mimeType: nil,
+                expectedContentLength:
+                contents.count,
+                textEncodingName: nil
+            )
+            let cachedResponse = CachedURLResponse(response:response , data: contents)
+            URLCache.shared.storeCachedResponse(cachedResponse, for: request)
+            return contents
+        } else {
+            return nil
+        }
+    }
 }
 
 extension UIImage

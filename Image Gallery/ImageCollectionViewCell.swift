@@ -37,9 +37,9 @@ class ImageCollectionViewCell: UICollectionViewCell {
     private func fetchImage() {
         if let url = imageURL {
             spinner.startAnimating()
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                let urlContents = try? Data(contentsOf: url)
-                DispatchQueue.main.async {
+            DispatchQueue.global(qos: .userInitiated).async {
+                let urlContents = url.cachedContents()
+                DispatchQueue.main.async { [weak self] in
                     guard url == self?.imageURL else {
                         return
                     }

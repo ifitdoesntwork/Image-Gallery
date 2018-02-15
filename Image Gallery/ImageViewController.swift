@@ -67,7 +67,7 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
         if let url = imageURL {
             spinner.startAnimating()
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                let urlContents = try? Data(contentsOf: url)
+                let urlContents = url.cachedContents()
                 DispatchQueue.main.async {
                     guard url == self?.imageURL else {
                         return

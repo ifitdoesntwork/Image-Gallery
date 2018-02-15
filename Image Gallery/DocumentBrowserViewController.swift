@@ -14,6 +14,8 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         static let main = "Main"
         static let document = "Document"
         static let templateFileName = "Untitled.gallery"
+        static let imageCacheMemoryCapacity = 100_000_000   // Worth ~100 photos or a dozen galleries.
+        static let imageCacheDiskCapacity = 200_000_000     // Twice the size of the memory limit.
     }
     
     override func viewDidLoad() {
@@ -32,6 +34,11 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                 allowsDocumentCreation = FileManager.default.createFile(atPath: template!.path, contents: Data())
             }
         }
+        URLCache.shared = URLCache(
+            memoryCapacity: Storyboard.imageCacheMemoryCapacity,
+            diskCapacity: Storyboard.imageCacheDiskCapacity,
+            diskPath: nil
+        )
     }
     
     private var template: URL?
@@ -43,11 +50,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didPickDocumentURLs documentURLs: [URL]) {
-        guard let sourceURL = documentURLs.first else { return }
-        
-        // Present the Document View Controller for the first document that was picked.
-        // If you support picking multiple items, make sure you handle them all.
-        presentDocument(at: sourceURL)
+        presentDocument(at: documentURLs.first)
     }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didImportDocumentAt sourceURL: URL, toDestinationURL destinationURL: URL) {
@@ -61,11 +64,11 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     // MARK: Document Presentation
     
-    func presentDocument(at documentURL: URL) {
+    func presentDocument(at documentURL: URL?) {
         let storyBoard = UIStoryboard(name: Storyboard.main, bundle: nil)
         let documentController = storyBoard.instantiateViewController(withIdentifier: Storyboard.document)
-        if let imageGalleryViewController = documentController.contents as? ImageGalleryViewController {
-            imageGalleryViewController.document = ImageGalleryDocument(fileURL: documentURL)
+        if let galleryController = documentController.contents as? ImageGalleryViewController, let url = documentURL {
+            galleryController.document = ImageGalleryDocument(fileURL: url)
         }
         present(documentController, animated: true)
     }
