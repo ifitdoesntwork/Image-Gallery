@@ -13,7 +13,7 @@ struct Gallery: Codable {
     var images: [Image]
     
     struct Image: Codable {
-        /// The image URL.
+        /// The image URL; the relative path is stored for local images.
         var url: URL
         
         /// The image height to width ratio.

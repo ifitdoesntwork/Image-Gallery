@@ -126,7 +126,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     // MARK: - UICollectionViewDropDelegate
     
     func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
-        return session.canLoadObjects(ofClass: NSURL.self)
+        return session.canLoadObjects(ofClass: NSURL.self) || session.canLoadObjects(ofClass: UIImage.self)
     }
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
@@ -161,7 +161,18 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
                 item.dragItem.itemProvider.loadObject(ofClass: NSURL.self) { [weak placeholderContext] (provider, error) in
                     DispatchQueue.main.async { [weak self] in
                         if let url = provider as? URL, let context = placeholderContext {
-                            self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: url.imageURL, loadedRatio: nil)
+                            self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: url.imageURL, loadedImage: nil)
+                        } else if let nsError = error as NSError?, nsError.code == -1200, let context = placeholderContext {
+                            if let directoryURL = UIImage.urlToStoreLocallyAsJPEG(named: "_")?.deletingLastPathComponent() {
+                                let images = ((try? FileManager.default.contentsOfDirectory(atPath: directoryURL.path)) ?? []).flatMap { fileName in
+                                    let extensionStartIndex = fileName.index(fileName.endIndex, offsetBy: -".jpg".count)
+                                    return String(fileName[..<extensionStartIndex])
+                                } + (self?.loadingImages.flatMap { $0.url?.lastPathComponent } ?? [])
+                                let url = URL(fileURLWithPath: "/" + Cell.imageTitle.madeUnique(withRespectTo: images) + ".jpg")
+                                self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: url, loadedImage: nil)
+                            } else {
+                                 placeholderContext?.deletePlaceholder()
+                            }
                         } else {
                             placeholderContext?.deletePlaceholder()
                         }
@@ -170,7 +181,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
                 item.dragItem.itemProvider.loadObject(ofClass: UIImage.self) { [weak placeholderContext] (provider, error) in
                     DispatchQueue.main.async { [weak self] in
                         if let image = provider as? UIImage, let context = placeholderContext {
-                            self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: nil, loadedRatio: image.size.height / image.size.width)
+                            self?.completeLoadingOfImage(at: imageIndex, in: context, loadedUrl: nil, loadedImage: image)
                         } else {
                             placeholderContext?.deletePlaceholder()
                         }
@@ -180,18 +191,22 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         }
     }
     
-    private var loadingImages = [(index: Int, context: UICollectionViewDropPlaceholderContext, url: URL?, heightToWidthRatio: CGFloat?)]()
+    private var loadingImages = [(index: Int, context: UICollectionViewDropPlaceholderContext, url: URL?, image: UIImage?)]()
 
-    private func completeLoadingOfImage(at index: Int, in placeholderContext: UICollectionViewDropPlaceholderContext, loadedUrl: URL?, loadedRatio: CGFloat?) {
+    private func completeLoadingOfImage(at index: Int, in placeholderContext: UICollectionViewDropPlaceholderContext, loadedUrl: URL?, loadedImage: UIImage?) {
         loadingImages[index].index = index
         if let url = loadedUrl {
             loadingImages[index].url = url
         }
-        if let ratio = loadedRatio {
-            loadingImages[index].heightToWidthRatio = ratio
+        if let image = loadedImage {
+            loadingImages[index].image = image
         }
         let loadedImage = loadingImages[index]
-        if let url = loadedImage.url, let ratio = loadedImage.heightToWidthRatio {
+        if let url = loadedImage.url, let image = loadedImage.image {
+            if url.isFileURL {
+                _ = image.storeLocallyAsJPEG(named: url.lastPathComponent)
+            }
+            let ratio = image.size.height / image.size.width
             placeholderContext.commitInsertion { insertionIndexPath in
                 imagesData.insert((url, ratio), at: insertionIndexPath.item)
             }
@@ -213,6 +228,10 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         session.localDragSession?.items.forEach { item in
             if let sourceIndexPath = (item.localObject as? (IndexPath, ImageData))?.0 {
                 collectionView?.performBatchUpdates({
+                    let url = imagesData[sourceIndexPath.item].url
+                    if url.isFileURL, let realURL = UIImage.urlToStoreLocallyAsJPEG(named: url.lastPathComponent) {
+                        try? FileManager.default.removeItem(at: realURL)
+                    }
                     imagesData.remove(at: sourceIndexPath.item)
                     collectionView?.deleteItems(at: [sourceIndexPath])
                 })
@@ -223,13 +242,28 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     // MARK: - Actions
     
     @IBAction private func close(_ sender: UIBarButtonItem) {
+        updateThumbnail()
+        dismiss(animated: true) {
+            self.document?.close()
+        }
+    }
+    
+    /// Updates the document's thumbnail.
+    func updateThumbnail() {
         let snapshotView = UIView(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024))
         (0...1).forEach { column in
             (0...1).forEach { row in
                 let index = row * 2 + column
                 if imagesData.count > index {
-                    if let imageData = imagesData[index].url.cachedContents(creatingCacheIfNoneAvailable: false) {
-                        let subview = UIImageView(image: UIImage(data: imageData))
+                    let url = imagesData[index].url
+                    let imageData: Data?
+                    if url.isFileURL, let realURL = UIImage.urlToStoreLocallyAsJPEG(named: url.lastPathComponent) {
+                        imageData = FileManager.default.contents(atPath: realURL.path)
+                    } else {
+                        imageData = imagesData[index].url.cachedContents(creatingCacheIfNoneAvailable: false)
+                    }
+                    if let data = imageData {
+                        let subview = UIImageView(image: UIImage(data: data))
                         subview.frame = CGRect(x: 512 * CGFloat(row), y: 512 * CGFloat(column), width: 512, height: 512)
                         subview.contentMode = .scaleAspectFit
                         snapshotView.addSubview(subview)
@@ -238,9 +272,6 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
             }
         }
         document?.thumbnail = snapshotView.snapshot
-        dismiss(animated: true) {
-            self.document?.close()
-        }
     }
     
     // MARK: - Navigation

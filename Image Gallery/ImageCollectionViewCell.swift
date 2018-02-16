@@ -38,7 +38,9 @@ class ImageCollectionViewCell: UICollectionViewCell {
         if let url = imageURL {
             spinner.startAnimating()
             DispatchQueue.global(qos: .userInitiated).async {
-                let urlContents = url.cachedContents(creatingCacheIfNoneAvailable: true)
+                let urlContents = url.isFileURL ?
+                    try? Data(contentsOf: UIImage.urlToStoreLocallyAsJPEG(named: url.lastPathComponent)!) :
+                    url.cachedContents(creatingCacheIfNoneAvailable: true)
                 DispatchQueue.main.async { [weak self] in
                     guard url == self?.imageURL else {
                         return

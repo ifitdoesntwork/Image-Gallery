@@ -193,6 +193,8 @@ class GalleryTableViewController: UITableViewController, GalleryTableViewCellDel
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Constants.gallerySegueIdentifier {
+            galleryInDetail?.controller.updateThumbnail()
+            galleryInDetail?.controller.document?.close()
             if let destination = segue.destination.contents as? ImageGalleryViewController {
                 if let cell = sender as? UITableViewCell, let indexPath = tableView.indexPath(for: cell) {
                     if let gallery = documents?.galleries[indexPath.row] {
