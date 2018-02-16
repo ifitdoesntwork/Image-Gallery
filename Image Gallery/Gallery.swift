@@ -9,19 +9,18 @@
 import Foundation
 
 struct Gallery: Codable {
-    /// The gallery unique ID.
-    var id: Int
-    var title: String?
     /// The gallery images data.
     var images: [Image]
     
     struct Image: Codable {
         /// The image URL.
         var url: URL
+        
         /// The image height to width ratio.
         var heightToWidthRatio: Double
     }
     
+    /// The gallery data encoded as a property list.
     var propertyList: Data? {
         return try? PropertyListEncoder().encode(self)
     }
@@ -35,7 +34,6 @@ struct Gallery: Codable {
     }
     
     init(images: [Image]) {
-        self.id = 0
         self.images = images
     }
 }

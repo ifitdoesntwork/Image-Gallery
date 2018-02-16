@@ -10,9 +10,9 @@ import UIKit
 
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
     
-    private struct Storyboard {
-        static let main = "Main"
-        static let document = "Document"
+    private struct Constants {
+        static let mainStoryboard = "Main"
+        static let documentIdentifier = "Document"
         static let templateFileName = "Untitled.gallery"
         static let imageCacheMemoryCapacity = 100_000_000   // Worth ~100 photos or a dozen galleries.
         static let imageCacheDiskCapacity = 200_000_000     // Twice the size of the memory limit.
@@ -29,14 +29,14 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                 in: .userDomainMask,
                 appropriateFor: nil,
                 create: true
-                ).appendingPathComponent(Storyboard.templateFileName)
+                ).appendingPathComponent(Constants.templateFileName)
             if template != nil {
                 allowsDocumentCreation = FileManager.default.createFile(atPath: template!.path, contents: Data())
             }
         }
         URLCache.shared = URLCache(
-            memoryCapacity: Storyboard.imageCacheMemoryCapacity,
-            diskCapacity: Storyboard.imageCacheDiskCapacity,
+            memoryCapacity: Constants.imageCacheMemoryCapacity,
+            diskCapacity: Constants.imageCacheDiskCapacity,
             diskPath: nil
         )
     }
@@ -64,11 +64,13 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     // MARK: Document Presentation
     
+    /// Presents a document modally and if possible sets its `document` property
+    /// to an instance of `Document` with `documentURL` as document's URL.
     func presentDocument(at documentURL: URL?) {
-        let storyBoard = UIStoryboard(name: Storyboard.main, bundle: nil)
-        let documentController = storyBoard.instantiateViewController(withIdentifier: Storyboard.document)
-        if let galleryController = documentController.contents as? ImageGalleryViewController, let url = documentURL {
-            galleryController.document = ImageGalleryDocument(fileURL: url)
+        let storyBoard = UIStoryboard(name: Constants.mainStoryboard, bundle: nil)
+        let documentController = storyBoard.instantiateViewController(withIdentifier: Constants.documentIdentifier)
+        if let galleryController = documentController.contents.contents as? ImageGalleryViewController, documentURL != nil {
+            galleryController.document = Document(fileURL: documentURL!)
         }
         present(documentController, animated: true)
     }

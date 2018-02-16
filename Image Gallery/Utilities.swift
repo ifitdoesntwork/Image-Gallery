@@ -219,6 +219,8 @@ extension UIViewController {
     var contents: UIViewController {
         if let navcon = self as? UINavigationController {
             return navcon.visibleViewController ?? navcon
+        } else if let split = self as? UISplitViewController {
+            return split.viewControllers.last ?? split
         } else {
             return self
         }

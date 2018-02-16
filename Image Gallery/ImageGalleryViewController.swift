@@ -18,11 +18,8 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         static let imageTitle = "Image"
     }
     
-    /// The image gallery delegate.
-    var delegate: ImageGalleryViewControllerDelegate?
-    
     /// The image gallery document.
-    var document: ImageGalleryDocument?
+    var document: Document?
     
     /// The gallery data model.
     var gallery: Gallery? {
@@ -45,14 +42,13 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     
     private var imagesData = [ImageData]() {
         didSet {
-            delegate?.gallerydidChangeModel(self)
             makeSureCellsFitViewHeight()
             document?.gallery = gallery
             document?.updateChangeCount(.done)
         }
     }
     
-    @IBOutlet weak var spinner: UIActivityIndicatorView!
+    @IBOutlet private weak var spinner: UIActivityIndicatorView!
     
     @IBOutlet private weak var trashCan: UIButton! {
         didSet {
@@ -226,7 +222,7 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
 
     // MARK: - Actions
     
-    @IBAction func close(_ sender: UIBarButtonItem) {
+    @IBAction private func close(_ sender: UIBarButtonItem) {
         document?.thumbnail = collectionView?.snapshot
         dismiss(animated: true) {
             self.document?.close()
@@ -254,20 +250,11 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(ImageGalleryViewController.pinch(_:)))
         collectionView?.addGestureRecognizer(pinch)
         if document == nil {
-            if let url = try? FileManager.default.url(
-                for: .documentDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: true
-                ).appendingPathComponent("Untitled.gallery") {
-                if !FileManager.default.isReadableFile(atPath: url.path) {
-                    do {
-                        try Data().write(to: url)
-                    } catch let error {
-                        print("Error creating empty file: \(error)")
-                    }
-                }
-                document = ImageGalleryDocument(fileURL: url)
+            if let galleries = Document.localGalleries, let firstGallery = galleries.galleries.first {
+                let firstDocument = galleries.url.appendingPathComponent(firstGallery)
+                document = Document(fileURL: firstDocument)
+            } else {
+                document = Document.makeLocalDocument()
             }
         }
     }
@@ -301,9 +288,4 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
         }
     }
 
-}
-
-protocol ImageGalleryViewControllerDelegate {
-    /// Informs the delegate that a `gallery` chanded its `images` data model.
-    func gallerydidChangeModel(_ gallery: ImageGalleryViewController)
 }
