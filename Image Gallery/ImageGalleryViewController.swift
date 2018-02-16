@@ -223,7 +223,21 @@ class ImageGalleryViewController: UICollectionViewController, UICollectionViewDe
     // MARK: - Actions
     
     @IBAction private func close(_ sender: UIBarButtonItem) {
-        document?.thumbnail = collectionView?.snapshot
+        let snapshotView = UIView(frame: CGRect(x: 0, y: 0, width: 1024, height: 1024))
+        (0...1).forEach { column in
+            (0...1).forEach { row in
+                let index = row * 2 + column
+                if imagesData.count > index {
+                    if let imageData = imagesData[index].url.cachedContents(creatingCacheIfNoneAvailable: false) {
+                        let subview = UIImageView(image: UIImage(data: imageData))
+                        subview.frame = CGRect(x: 512 * CGFloat(row), y: 512 * CGFloat(column), width: 512, height: 512)
+                        subview.contentMode = .scaleAspectFit
+                        snapshotView.addSubview(subview)
+                    }
+                }
+            }
+        }
+        document?.thumbnail = snapshotView.snapshot
         dismiss(animated: true) {
             self.document?.close()
         }

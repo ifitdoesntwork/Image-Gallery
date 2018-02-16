@@ -87,11 +87,11 @@ extension URL {
         }
     }
     
-    func cachedContents() -> Data? {
+    func cachedContents(creatingCacheIfNoneAvailable: Bool) -> Data? {
         let request = URLRequest(url: self)
         if let cachedContents = URLCache.shared.cachedResponse(for: request)?.data {
             return cachedContents
-        } else if let contents = try? Data(contentsOf: self) {
+        } else if creatingCacheIfNoneAvailable, let contents = try? Data(contentsOf: self) {
             let response = URLResponse(
                 url: self,
                 mimeType: nil,

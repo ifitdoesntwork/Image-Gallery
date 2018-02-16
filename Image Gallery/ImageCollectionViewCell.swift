@@ -38,7 +38,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
         if let url = imageURL {
             spinner.startAnimating()
             DispatchQueue.global(qos: .userInitiated).async {
-                let urlContents = url.cachedContents()
+                let urlContents = url.cachedContents(creatingCacheIfNoneAvailable: true)
                 DispatchQueue.main.async { [weak self] in
                     guard url == self?.imageURL else {
                         return
